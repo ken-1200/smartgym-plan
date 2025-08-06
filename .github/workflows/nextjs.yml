@@ -52,16 +52,15 @@ jobs:
 
       # 6) 依存インストール
       - run: pnpm install --frozen-lockfile
+        working-directory: frontend
 
-      # 7) next.config.js の削除
-      - run: rm -f next.config.js
-
-      # 8) ビルド
+      # 7) ビルド
       - run: pnpm build
+        working-directory: frontend
         env:
           GHP_URL: ${{ github.actor }}.github.io/${{ github.event.repository.name }}
 
-      # 9) 静的ファイルをアップロード
+      # 8) 静的ファイルをアップロード
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out

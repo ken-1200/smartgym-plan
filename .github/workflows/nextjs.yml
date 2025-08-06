@@ -1,0 +1,76 @@
+# 📦 Next.js → GitHub Pages
+name: Deploy Next.js site to Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1) ソース取得
+      - uses: actions/checkout@v4
+
+      # 2) pnpm を先にインストール
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9 # lockfile に合わせて調整
+          run_install: false # install は後段で実行
+
+      # 3) Node をセットアップ（pnpm キャッシュ有効）
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      # 4) GitHub Pages 用 Next.js 設定
+      - uses: actions/configure-pages@v5
+        with:
+          static_site_generator: next
+
+      # 5) Next.js ビルドキャッシュ復元
+      - uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+
+      # 6) 依存インストール
+      - run: pnpm install --frozen-lockfile
+
+      # 7) next.config.js の削除
+      - run: rm -f next.config.js
+
+      # 8) ビルド
+      - run: pnpm build
+        env:
+          GHP_URL: ${{ github.actor }}.github.io/${{ github.event.repository.name }}
+
+      # 9) 静的ファイルをアップロード
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

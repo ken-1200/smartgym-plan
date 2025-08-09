@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
 import { UserProfile, Machine, WorkoutPlan } from '@/src/lib/types';
 import { machines } from '@/src/lib/machine-data';
 import { calculateWorkoutPlan } from '@/src/lib/workout-calculator';
@@ -17,8 +16,6 @@ export default function Home() {
   const [selectedMachines, setSelectedMachines] = useState<Machine[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan[]>([]);
-
-  const t = useTranslations('HomePage');
 
   const handleStart = () => {
     setCurrentScreen('machine-selection');
@@ -67,7 +64,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
-      <h1>{t('title')}</h1>
       {currentScreen === 'top' && <TopScreen onStart={handleStart} />}
       {currentScreen === 'machine-selection' && (
         <MachineSelection machines={machines} onNext={handleMachineSelect} onBack={handleBack} />

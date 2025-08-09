@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { UserProfile, Machine, WorkoutPlan } from '@/src/lib/types';
 import { machines } from '@/src/lib/machine-data';
 import { calculateWorkoutPlan } from '@/src/lib/workout-calculator';
+import ThemeToggle from '@/src/components/theme-switcher';
 import TopScreen from '@/src/components/screens/top-screen';
 import MachineSelection from '@/src/components/screens/machine-selection';
 import ProfileInput from '@/src/components/screens/profile-input';
@@ -64,6 +65,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
+      <ThemeToggle />
       {currentScreen === 'top' && <TopScreen onStart={handleStart} />}
       {currentScreen === 'machine-selection' && (
         <MachineSelection machines={machines} onNext={handleMachineSelect} onBack={handleBack} />
